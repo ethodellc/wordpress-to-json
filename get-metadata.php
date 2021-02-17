@@ -1,9 +1,12 @@
 <?php
+
+echo "Retrieving posts...\n";
+
 $allPostsSql = $db->prepare('SELECT * FROM wp_posts WHERE `post_status` = "publish" AND post_content != "{{unknown}}" AND post_content != ""');
 $allPostsSql->execute();
 $allPosts = $allPostsSql->fetchAll(PDO::FETCH_ASSOC);
 
-
+echo "Retrieving tags...\n";
 $tags = array();
 $allTagIds = $db->prepare('SELECT * FROM wp_term_taxonomy WHERE taxonomy = "post_tag"');
 $allTagIds->execute();
@@ -15,6 +18,8 @@ foreach ($allTagIds->fetchAll() as $tagId) {
 }
 
 
+
+echo "Retrieving categories...\n";
 $categories = array();
 $allCategoryIds = $db->prepare('SELECT * FROM wp_term_taxonomy WHERE taxonomy = "category"');
 $allCategoryIds->execute();
@@ -26,6 +31,7 @@ foreach ($allCategoryIds->fetchAll() as $tagId) {
 }
 
 
+echo "Retrieving authors...\n";
 $allAuthors = array();
 $allAuthorIds = $db->prepare('SELECT * FROM wp_users');
 $allAuthorIds->execute();
@@ -59,6 +65,5 @@ foreach ($allAuthorIds->fetchAll(PDO::FETCH_ASSOC) as $author) {
 	
 	array_push($allAuthors, $authorMeta);
 }
-
 
 ?>

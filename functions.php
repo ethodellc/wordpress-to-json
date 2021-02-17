@@ -1,9 +1,17 @@
 <?php
 try {
-	$dbConf = parse_ini_file("/opt/php-db-local.ini");
+	echo "Connecting to database...\n";
+	$dbConf = parse_ini_file("migration-db.ini");
 	$db = new PDO($dbConf['dsn'], $dbConf['user'], $dbConf['pass']);
 } catch (PDOException $e) {
-	echo "something went wrong";
+	echo "Connection failed...\n";
+	echo $e;
+	exit(1);
+}
+
+if ($db) {
+	echo "Database connection success!\n";
+	echo "Starting content extraction\n";
 }
 
 function getYoastMetadata (PDO $db, Int $postId) {
@@ -58,6 +66,7 @@ function getPostMetaIdentifiers (PDO $db, Int $postId) {
 	return $postQuery->fetchAll(PDO::FETCH_ASSOC);
 }
 
+
 function getPostCategory (PDO $db, Int $postId, array $categories) {
 	$postTaxonomy = getPostMetaIdentifiers($db, $postId);
 	foreach ($postTaxonomy as $taxonomyEntry) {
@@ -68,6 +77,7 @@ function getPostCategory (PDO $db, Int $postId, array $categories) {
 		}
 	}
 }
+
 
 function getPostTags (PDO $db, Int $postId, array $tags) {
 	$out = array();
@@ -82,6 +92,38 @@ function getPostTags (PDO $db, Int $postId, array $tags) {
 	return $out;
 }
 
+
+function getTagsList (PDO $db, Int $postId, array $tags, string $type) {
+	$out = array();
+	$tagList = getPostTags($db, $postId, $tags);
+	if (count($tagList) > 0) {
+		foreach ($tagList as $tag) {
+			array_push($out, $tag['name']);
+		}
+		if ($type === "array") {
+			return $out;
+		} else if ($type === "string") {
+			return join(",", $out);
+		}
+	}
+
+	if ($type === "array") {
+		return array();
+	} else if ($type === "string") {
+		return '';
+	}
+}
+
+
+function getTagsListFromPostData (array $post) {
+	$out = array();
+	foreach ($post['legacyData']['tags'] as $tag) {
+		array_push($out, $tag['name']);
+	}
+	return $out;
+}
+
+
 function getPostAuthor (Int $authorId, array $authors) {
 	foreach ($authors as $author) {
 		if ($author['ID'] === $authorId) {
@@ -89,4 +131,31 @@ function getPostAuthor (Int $authorId, array $authors) {
 		}
 	}
 }
+
+
+function getUniqueTags (array $posts) {
+	$uniqueTags = array();
+
+	foreach ($posts as $post) {
+		$postTags = getTagsListFromPostData($post);
+		foreach ($postTags as $tag) {
+			if (in_array($tag, $uniqueTags, false) === false) {
+				array_push($uniqueTags, $tag);
+			}
+		}
+	}
+	return $uniqueTags;
+}
+
+
+function getUniqueCategories (array $posts) {
+	$uniqueCategories = array();
+	foreach ($posts as $post) {
+		if (in_array($post['category'], $uniqueCategories, false) === false) {
+			array_push($uniqueCategories, $post['category']);
+		}
+	}
+	return $uniqueCategories;
+}
+
 ?>
