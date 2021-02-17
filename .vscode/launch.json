@@ -11,6 +11,14 @@
 			"port": 9000
 		},
 		{
+			"name": "Launch Extraction Script",
+			"type": "php",
+			"request": "launch",
+			"program": "${workspaceRoot}/wp-to-json.php",
+			"cwd": "${workspaceRoot}",
+			"port": 9000
+		},
+		{
 			"name": "Launch currently open script",
 			"type": "php",
 			"request": "launch",
