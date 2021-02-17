@@ -31,7 +31,7 @@ $allAuthorIds = $db->prepare('SELECT * FROM wp_users');
 $allAuthorIds->execute();
 foreach ($allAuthorIds->fetchAll(PDO::FETCH_ASSOC) as $author) {
 	$authorMeta = array(
-		'ID' => $author['ID'],
+		'ID' => (int)$author['ID'],
 		'display_name' => $author['display_name'],
 		'user_email' => $author['user_email']
 	);
@@ -39,8 +39,22 @@ foreach ($allAuthorIds->fetchAll(PDO::FETCH_ASSOC) as $author) {
 	$authorMetaQuery->bindParam(":userId", $author['ID']);
 	$authorMetaQuery->execute();
 	foreach ($authorMetaQuery->fetchAll(PDO::FETCH_ASSOC) as $authorMetaItem) {
-		if ($authorMetaItem['meta_key'] !== 'rich_editing' && $authorMetaItem['meta_key'] !== 'admin_color' && $authorMetaItem['meta_key'] !== 'dismissed_wp_pointers' && $authorMetaItem['meta_key'] !== 'wp_capabilities' && $authorMetaItem['meta_key'] !== 'wp_user_level')
-		$authorMeta[$authorMetaItem['meta_key']] = $authorMetaItem['meta_value'];
+		if (
+			$authorMetaItem['meta_key'] === 'first_name' ||
+			$authorMetaItem['meta_key'] === 'last_name' ||
+			$authorMetaItem['meta_key'] === 'user_email' ||
+			$authorMetaItem['meta_key'] === 'description' ||
+			$authorMetaItem['meta_key'] === 'custom_jobtitle' ||
+			$authorMetaItem['meta_key'] === 'facebook' ||
+			$authorMetaItem['meta_key'] === 'twitter' ||
+			$authorMetaItem['meta_key'] === 'custom_twitter' ||
+			$authorMetaItem['meta_key'] === 'custom_linkedin' ||
+			$authorMetaItem['meta_key'] === 'custom_googleplus' ||
+			$authorMetaItem['meta_key'] === 'wpseo_metadesc' ||
+			$authorMetaItem['meta_key'] === 'wpseo_title'
+		) {
+			$authorMeta[$authorMetaItem['meta_key']] = $authorMetaItem['meta_value'];
+		}
 	}
 	
 	array_push($allAuthors, $authorMeta);
