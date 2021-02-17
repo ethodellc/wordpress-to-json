@@ -41,9 +41,12 @@ function getPostTags (PDO $db, Int $postId, array $tags) {
 	return $out;
 }
 
-function getPostAuthor (PDO $db, Int $authorId) {
-	$out = array();
-	return $out;
+function getPostAuthor (Int $authorId, array $authors) {
+	foreach ($authors as $author) {
+		if ($author['ID'] == $authorId) {
+			return $author;
+		}
+	}
 }
 
 foreach ($allPosts as $post) {
@@ -59,11 +62,11 @@ foreach ($allPosts as $post) {
 		'legacyAuthor' => $post['post_author'],
 		'category' => getPostCategory($db, $post['ID'], $categories),
 		'tags' => getPostTags($db, $post['ID'], $tags),
-		'author' => getPostAuthor($db, $post['post_author'])
+		'author' => getPostAuthor($post['post_author'], $allAuthors)
 	);
 
 	array_push($posts, $out);
 }
 
-
+$siteJSON = json_encode($posts);
 ?>

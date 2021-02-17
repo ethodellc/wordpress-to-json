@@ -24,4 +24,27 @@ foreach ($allCategoryIds->fetchAll() as $tagId) {
 	$categoryQuery->execute();
 	array_push($categories, $categoryQuery->fetch(PDO::FETCH_ASSOC));
 }
+
+
+$allAuthors = array();
+$allAuthorIds = $db->prepare('SELECT * FROM wp_users');
+$allAuthorIds->execute();
+foreach ($allAuthorIds->fetchAll(PDO::FETCH_ASSOC) as $author) {
+	$authorMeta = array(
+		'ID' => $author['ID'],
+		'display_name' => $author['display_name'],
+		'user_email' => $author['user_email']
+	);
+	$authorMetaQuery = $db->prepare('SELECT * FROM wp_usermeta WHERE user_id = :userId');
+	$authorMetaQuery->bindParam(":userId", $author['ID']);
+	$authorMetaQuery->execute();
+	foreach ($authorMetaQuery->fetchAll(PDO::FETCH_ASSOC) as $authorMetaItem) {
+		if ($authorMetaItem['meta_key'] !== 'rich_editing' && $authorMetaItem['meta_key'] !== 'admin_color' && $authorMetaItem['meta_key'] !== 'dismissed_wp_pointers' && $authorMetaItem['meta_key'] !== 'wp_capabilities' && $authorMetaItem['meta_key'] !== 'wp_user_level')
+		$authorMeta[$authorMetaItem['meta_key']] = $authorMetaItem['meta_value'];
+	}
+	
+	array_push($allAuthors, $authorMeta);
+}
+
+
 ?>
