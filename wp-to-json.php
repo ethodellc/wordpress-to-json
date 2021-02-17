@@ -43,14 +43,14 @@ function getPostTags (PDO $db, Int $postId, array $tags) {
 
 function getPostAuthor (Int $authorId, array $authors) {
 	foreach ($authors as $author) {
-		if ($author['ID'] == $authorId) {
+		if ($author['ID'] === $authorId) {
 			return $author;
 		}
 	}
 }
 
 foreach ($allPosts as $post) {
-	$out = Array(
+	$out = array(
 		'stName' => 'Blog',
 		'title' => $post['post_title'],
 		'urlTitle' => $post['post_name'],
