@@ -1,4 +1,11 @@
 <?php
+try {
+	$dbConf = parse_ini_file("/opt/php-db-local.ini");
+	$db = new PDO($dbConf['dsn'], $dbConf['user'], $dbConf['pass']);
+} catch (PDOException $e) {
+	echo "something went wrong";
+}
+
 function getYoastMetadata (PDO $db, Int $postId) {
 	$yoastQuery = $db->prepare("SELECT * FROM wp_yoast_indexable WHERE `object_id` = :postId");
 	$yoastQuery->bindParam(":postId", $postId);
@@ -15,6 +22,7 @@ function getSEOTitle (PDO $db, Int $postId, string $originalTitle) {
 	return $originalTitle;
 }
 
+
 function getSEODescription (PDO $db, Int $postId) {
 	$postYoast = getYoastMetadata($db, $postId);
 	if ($postYoast['description'] !== null) {
@@ -22,6 +30,26 @@ function getSEODescription (PDO $db, Int $postId) {
 	}
 	return "";
 }
+
+
+function getFeatureImage (PDO $db, Int $postId) {
+	$thumbnailIdQuery = $db->prepare('SELECT * FROM wp_postmeta WHERE `post_id` = :postId AND `meta_key` = "_thumbnail_id"');
+	$thumbnailIdQuery->bindParam(":postId", $postId);
+	$thumbnailIdQuery->execute();
+	$thumbnailIdRow = $thumbnailIdQuery->fetch(PDO::FETCH_ASSOC);
+
+	if ($thumbnailIdRow !== false) {
+		$thumbnailFilePathQuery = $db->prepare('SELECT * FROM wp_postmeta WHERE `post_id` = :postId AND `meta_key` = "_wp_attached_file"');
+		$thumbnailFilePathQuery->bindParam("postId", $thumbnailIdRow['meta_value']);
+		$thumbnailFilePathQuery->execute();
+		$thumbnail = $thumbnailFilePathQuery->fetch(PDO::FETCH_ASSOC);
+		if ($thumbnail !== false) {
+			return $thumbnail['meta_value'];
+		}
+	}
+	return "";
+}
+
 
 function getPostMetaIdentifiers (PDO $db, Int $postId) {
 	$postQuery = $db->prepare('SELECT * FROM wp_term_relationships WHERE object_id = :postId');
