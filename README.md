@@ -4,7 +4,7 @@ Extracts Wordpress posts, terms, authors, categories, and metadata into JSON fil
 
 ### Requirements
 
-`php-cli` with PDO extension and and appropriate driver database engine you're using.
+`php-cli` with PDO extension with appropriate driver for the database you're using.
 
 ### Preperation
 
@@ -27,4 +27,4 @@ There will be no console output, but you should see some JSON files in the curre
 
 #### Other notes
 
-This was hastily built with minimal error checking.
+This was hastily built with minimal error checking, all database operations are read-only.
