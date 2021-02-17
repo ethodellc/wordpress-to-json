@@ -68,5 +68,11 @@ foreach ($allPosts as $post) {
 	array_push($posts, $out);
 }
 
-$siteJSON = json_encode($posts);
+$fp = fopen('all-posts.json', 'w');
+fwrite($fp, json_encode($posts));
+fclose($fp);
+
+$fp = fopen('all-authors.json', 'w');
+fwrite($fp, json_encode($allAuthors));
+fclose($fp);
 ?>
