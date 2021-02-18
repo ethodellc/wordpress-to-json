@@ -49,13 +49,15 @@ echo "Starting cleanup...\n";
 echo "\n";
 
 
-
 echo "Writing files...\n";
-$fp = fopen('all-posts.json', 'w');
+
+mkdir("./out");
+
+$fp = fopen('./out/all-posts.json', 'w');
 fwrite($fp, json_encode($posts));
 fclose($fp);
 
-$fp = fopen('all-authors.json', 'w');
+$fp = fopen('./out/all-authors.json', 'w');
 fwrite($fp, json_encode($allAuthors));
 fclose($fp);
 echo "Finished!\n";
