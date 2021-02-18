@@ -26,8 +26,9 @@ foreach ($allPosts as $post) {
 			'tags' => getPostTags($db, $post['ID'], $tags),
 		),
 		'category' => getPostCategory($db, $post['ID'], $categories),
-		'tags' => getTagsList($db, $post['ID'], $tags, "array")
+		'tags' => getTagsList($db, $post['ID'], $tags, "string")
 	);
+
 	array_push($posts, $out);
 }
 echo "Finished base extraction...\n";
@@ -47,18 +48,30 @@ echo 'Unique categories extracted:  ' . count($uniqueCategories) . "\n";
 // Cleanup
 echo "Starting cleanup...\n";
 echo "\n";
+echo "Serializing legacy data...";
+foreach ($posts as $post) {
+	$post['legacyData'] = json_encode($post['legacyData']);
+}
 
 
 echo "Writing files...\n";
-
-mkdir("./out");
-
-$fp = fopen('./out/all-posts.json', 'w');
-fwrite($fp, json_encode($posts));
-fclose($fp);
-
-$fp = fopen('./out/all-authors.json', 'w');
-fwrite($fp, json_encode($allAuthors));
-fclose($fp);
-echo "Finished!\n";
-?>
+if (is_dir(('./out')) === false) {
+	mkdir("./out", 0755);
+}
+if (is_dir('./out') === true) {
+	$fp = fopen('./out/all-posts.json', 'w');
+	fwrite($fp, json_encode($posts));
+	fclose($fp);
+	
+	$fp = fopen('./out/all-tags.json', 'w');
+	fwrite($fp, json_encode($uniqueTags));
+	fclose($fp);
+	
+	$fp = fopen('./out/all-authors.json', 'w');
+	fwrite($fp, json_encode($allAuthors));
+	fclose($fp);
+	echo "Finished!\n";
+} else {
+	echo "Error: Could not create output directory!";
+	exit(1);
+}
