@@ -1,28 +1,28 @@
 # Wordpress to JSON
 
-Extracts Wordpress posts, terms, authors, tags, categories, and metadata into JSON files, useful for porting blogs into other Content Management Systems.
+Extracts WordPress posts, terms, authors, tags, categories, and metadata into JSON files. Useful for migrating WordPress blogs into other Content Management Systems.
 
 
 ### Requirements
 
-`php-cli` with PDO extension with appropriate driver for the database you're using.
+`php-cli` with PDO extension with appropriate database driver.
 
 
-### Preperation
+### Preparation
 
 Create a file in the working directory named `migration-db.ini` with the following contents:
 
 ```
 [dbconnection]
 dsn = "mysql:dbname={DATABASENAME};unix_socket={/var/run/mysqld/mysqld.sock}"
-user = "wpuser"
-pass = "password"
+user = "{wpuser}"
+pass = "{password}"
 ```
 
 
 ### Running
 
-php wp-to-json.php
+`php wp-to-json.php`
 
 Once extracted, the script will write the following JSON files in the working directory:
 
@@ -34,4 +34,5 @@ Once extracted, the script will write the following JSON files in the working di
 
 #### Other notes
 
-This was hastily built with minimal error checking, all database operations are read-only.
+- All database operations are read-only.
+- Extracts Yoast Premium SEO titles and descriptions
